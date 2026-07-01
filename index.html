@@ -90,8 +90,7 @@ const QUARTERS=['Q1 Jul-Sep','Q2 Oct-Dec','Q3 Jan-Mar','Q4 Apr-Jun'];
   Replace the text below with your Google Apps Script Web App URL.
   Example: https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxx/exec
 */
-const APPS_SCRIPT_WEB_APP_URL = '<?!= getWebAppUrl_(); ?>';
-const ONLINE_SYNC_ENABLED = APPS_SCRIPT_WEB_APP_URL && !APPS_SCRIPT_WEB_APP_URL.includes('PASTE_YOUR');
+const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztdwbm5NFImvclrD-9Gs0_hglcyGVwqZkOaZawi9KQsN9hYIGYvNgkFE14bFSewvPt/exec";const ONLINE_SYNC_ENABLED = APPS_SCRIPT_WEB_APP_URL && !APPS_SCRIPT_WEB_APP_URL.includes('PASTE_YOUR');
 
 function onlineEnabled(){return !!ONLINE_SYNC_ENABLED;}
 function setSyncStatus(message, cls='') {
