@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FY26-27 EMEA Sales, Delivery & Tentative Projection Dashboard</title>
+<style>
+  :root{
+    --bg:#f4f7fb; --card:#fff; --text:#000000; --muted:#000000; --line:#e5e7eb;
+    --brand:#1f4e79; --brand2:#2e75b6; --good:#0f8a4b; --warn:#b7791f; --bad:#c62828; --softbad:#fff1f1;
+    --softgood:#ecfdf3; --softbrand:#eaf3ff; --shadow:0 10px 24px rgba(16,24,40,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#ffffff;color:#000000;padding:22px 28px;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
+  header h1{margin:0;font-size:24px} header p{margin:6px 0 0;opacity:.9;font-size:13px}
+  main{padding:20px;max-width:1600px;margin:auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}.tab{border:1px solid var(--brand2);background:var(--brand2);color:#ffffff;padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:700;box-shadow:0 2px 6px rgba(31,78,121,.18)}.tab:hover{background:var(--brand);border-color:var(--brand)}.tab.active{background:#123b5d;color:#ffffff;border-color:#123b5d;box-shadow:0 3px 10px rgba(31,78,121,.28)}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}.card h2,.card h3{margin:0 0 12px}.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.kpi .label{font-size:12px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;font-weight:800;margin-top:6px}.kpi .sub{font-size:12px;color:var(--muted);margin-top:3px}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;font-size:13px;vertical-align:middle}th{background:#f8fafc;color:#000000;font-size:12px;text-transform:uppercase}.num{text-align:right}.flag{background:var(--softbad);color:var(--bad);font-weight:800;border-radius:999px;padding:4px 8px;font-size:12px;display:inline-block;margin:1px 0}.ok{background:var(--softgood);color:var(--good);font-weight:800;border-radius:999px;padding:4px 8px;font-size:12px;display:inline-block;margin:1px 0}.pill{background:var(--softbrand);color:var(--brand);font-weight:800;border-radius:999px;padding:4px 8px;font-size:12px;display:inline-block;margin:1px 0}
+  input,select,textarea{width:100%;border:1px solid #cfd6e4;border-radius:10px;padding:8px;font-size:13px;background:#fff}textarea{min-height:54px}.form-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:10px}.form-row.small{grid-template-columns:repeat(4,1fr)}label{font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+  button{border:0;background:var(--brand);color:#ffffff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}button:hover{filter:brightness(.95)}button.secondary{background:#fff;color:#000000;border:1px solid var(--brand)}button.danger{background:var(--bad)}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hidden{display:none}.note{font-size:13px;color:var(--muted)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.progress{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden;margin-top:4px}.bar{height:100%;background:var(--brand);width:0}.bar.goodbar{background:var(--good)}.bar.badbar{background:var(--bad)}.smalltext{font-size:12px;color:var(--muted)}
+
+  .chart-grid{display:grid;grid-template-columns:repeat(2,minmax(320px,1fr));gap:16px}
+  .chart-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px;page-break-inside:avoid}
+  .chart-card h3{margin:0 0 4px;font-size:18px}.chart-card .desc{font-size:12px;color:#000;margin-bottom:14px}
+  .chart-row{display:grid;grid-template-columns:150px 1fr 95px;gap:10px;align-items:center;margin:9px 0}
+  .chart-label{font-size:12px;font-weight:700;color:#000}.chart-value{text-align:right;font-size:12px;font-weight:800;color:#000}
+  .chart-track{height:20px;background:#eef2f7;border-radius:999px;overflow:hidden;position:relative}.chart-fill{height:100%;background:#2e75b6;border-radius:999px}.chart-fill.delivery{background:#0f8a4b}.chart-fill.warnfill{background:#b7791f}.chart-fill.badfill{background:#c62828}
+  .chart-mini{display:flex;gap:6px;align-items:end;height:150px;padding:12px 4px 0;border-bottom:1px solid #d9e2ef}.chart-col{flex:1;display:flex;gap:4px;align-items:end;justify-content:center}.chart-bar{width:28px;min-height:2px;background:#2e75b6;border-radius:8px 8px 0 0}.chart-bar.delivery{background:#0f8a4b}.chart-bar.target{background:#b7791f}.chart-axis{display:flex;gap:6px;font-size:11px;font-weight:700;text-align:center;margin-top:6px}.chart-axis span{flex:1}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:700;margin-top:10px}.legend i{width:12px;height:12px;display:inline-block;border-radius:3px;margin-right:4px;vertical-align:-1px}.legend .sales{background:#2e75b6}.legend .delivery{background:#0f8a4b}.legend .target{background:#b7791f}
+  .presentation-title{background:#123b5d;color:#fff;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}.presentation-title h2{margin:0;color:#fff}.presentation-title p{margin:6px 0 0;color:#fff}
+  .chart-data{margin-top:12px;font-size:12px}.chart-data th,.chart-data td{font-size:12px;padding:6px}.chart-data th{background:#eef4fb}.accuracy-box{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;font-size:13px}
+  #syncStatus{background:#eef4fb;border:1px solid #c9d9ec;border-radius:14px;padding:10px 12px;margin:0 0 14px;font-size:13px;font-weight:700;color:#000}
+  @media print{header,.tabs,.actions button:not(.printKeep){display:none!important}main{max-width:none;padding:0}.view.hidden{display:none!important}.card,.chart-card{box-shadow:none}.chart-grid{grid-template-columns:1fr 1fr}body{background:#fff}}
+  @media(max-width:1000px){.grid,.grid3,.grid2,.form-row,.form-row.small{grid-template-columns:1fr}header{position:static}}
+</style>
+</head>
+<body>
+<header>
+  <h1>FY26-27 EMEA Sales, Delivery & Tentative Projection Dashboard</h1>
+  <p>FY starts 1 July 2026 and ends 30 June 2027. Team members update every Tuesday for the current month and next two months.</p>
+</header>
+<main>
+  <div class="tabs">
+    <button class="tab active" data-view="entry">Weekly Entry</button>
+    <button class="tab" data-view="quotes">Quotation Tracker</button>
+    <button class="tab" data-view="weeklyRegion">Weekly Regional Update</button>
+    <button class="tab" data-view="charts">Presentation Charts</button>
+    <button class="tab" data-view="manager">EMEA Dashboard</button>
+    <button class="tab" data-view="regions">Region Dashboards</button>
+    <button class="tab" data-view="qytd">Quarterly / Half-Year / YTD / Annual Dashboard</button>
+    <button class="tab" data-view="individual">Individual Dashboard</button>
+    <button class="tab" data-view="settings">Backup / Reset</button>
+  </div>
+  <div id="syncStatus">Online sync not configured yet. Paste the Google Apps Script Web App URL inside the HTML file.</div>
+
+  <section id="entry" class="view"></section>
+  <section id="manager" class="view hidden"></section>
+  <section id="regions" class="view hidden"></section>
+  <section id="qytd" class="view hidden"></section>
+  <section id="individual" class="view hidden"></section>
+  <section id="quotes" class="view hidden"></section>
+  <section id="weeklyRegion" class="view hidden"></section>
+  <section id="charts" class="view hidden"></section>
+  <section id="settings" class="view hidden"></section>
+</main>
+<script>
+const FY_START = new Date(2026,6,1); // 1 July 2026
+const FY_END = new Date(2027,5,30);
+const CURRENCY = 'AUD';
+const TEAM = [
+ {region:'Middle East', name:'Fauzan Ahmad', yearly:815399, q:[227496,203850,178572,205481]},
+ {region:'Middle East', name:'Kiran M', yearly:815399, q:[227496,203850,178572,205481]},
+ {region:'Africa', name:'Ajith KA', yearly:616224, q:[171927,134952,155289,154056]},
+ {region:'Europe', name:'Parthiban P', yearly:413602, q:[90579,97886,109742,115395]},
+ {region:'Europe', name:'Aijaz Yousuf', yearly:258504, q:[56613,61179,68589,72123]},
+ {region:'Europe', name:'TBH', yearly:361901, q:[79257,85649,96024,100971]}
+];
+const MONTHS = [
+ {key:'2026-07', label:'July 2026', short:'Jul', q:0, half:1}, {key:'2026-08', label:'August 2026', short:'Aug', q:0, half:1}, {key:'2026-09', label:'September 2026', short:'Sep', q:0, half:1},
+ {key:'2026-10', label:'October 2026', short:'Oct', q:1, half:1}, {key:'2026-11', label:'November 2026', short:'Nov', q:1, half:1}, {key:'2026-12', label:'December 2026', short:'Dec', q:1, half:1},
+ {key:'2027-01', label:'January 2027', short:'Jan', q:2, half:2}, {key:'2027-02', label:'February 2027', short:'Feb', q:2, half:2}, {key:'2027-03', label:'March 2027', short:'Mar', q:2, half:2},
+ {key:'2027-04', label:'April 2027', short:'Apr', q:3, half:2}, {key:'2027-05', label:'May 2027', short:'May', q:3, half:2}, {key:'2027-06', label:'June 2027', short:'Jun', q:3, half:2}
+];
+const QUARTERS=['Q1 Jul-Sep','Q2 Oct-Dec','Q3 Jan-Mar','Q4 Apr-Jun'];
+
+/*
+  GOOGLE SHEET ONLINE SYNC SETUP
+  Replace the text below with your Google Apps Script Web App URL.
+  Example: https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxx/exec
+*/
+const APPS_SCRIPT_WEB_APP_URL = '<?!= getWebAppUrl_(); ?>';
+const ONLINE_SYNC_ENABLED = APPS_SCRIPT_WEB_APP_URL && !APPS_SCRIPT_WEB_APP_URL.includes('PASTE_YOUR');
+
+function onlineEnabled(){return !!ONLINE_SYNC_ENABLED;}
+function setSyncStatus(message, cls='') {
+ const el=document.getElementById('syncStatus');
+ if(!el) return;
+ el.textContent=message;
+ el.style.background = cls==='bad' ? '#fff1f1' : cls==='good' ? '#ecfdf3' : '#eef4fb';
+ el.style.borderColor = cls==='bad' ? '#f2b8b8' : cls==='good' ? '#b7e4c7' : '#c9d9ec';
+}
+function scriptUrl(params={}){
+ const u=new URL(APPS_SCRIPT_WEB_APP_URL);
+ Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+ return u.toString();
+}
+function jsonp(action, params={}){
+ return new Promise((resolve,reject)=>{
+   if(!onlineEnabled()) return reject(new Error('Online sync is not configured.'));
+   const cb='emea_cb_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+   const script=document.createElement('script');
+   const timer=setTimeout(()=>{cleanup();reject(new Error('Google Sheet connection timed out.'));},30000);
+   function cleanup(){clearTimeout(timer);delete window[cb];if(script.parentNode) script.remove();}
+   window[cb]=(payload)=>{cleanup();resolve(payload);};
+   script.onerror=()=>{cleanup();reject(new Error('Unable to reach Google Apps Script Web App.'));};
+   script.src=scriptUrl({action,callback:cb,...params});
+   document.body.appendChild(script);
+ });
+}
+function normalizeRemoteData(remote){
+ const clean={updates:{},quotes:[]};
+ (remote.weekly||[]).forEach(r=>{
+   if(!r.member || !r.tue || !r.monthKey) return;
+   if(!clean.updates[r.member]) clean.updates[r.member]={};
+   if(!clean.updates[r.member][r.tue]) clean.updates[r.member][r.tue]={};
+   clean.updates[r.member][r.tue][r.monthKey]={
+     sales:Number(r.sales||0), delivery:Number(r.delivery||0),
+     tentativeSales:Number(r.tentativeSales||0), tentativeDelivery:Number(r.tentativeDelivery||0),
+     notes:r.notes||''
+   };
+ });
+ clean.quotes=(remote.quotes||[]).map(q=>({
+   id:q.id||makeId('q'), member:q.member||'', tue:q.tue||'', customer:q.customer||'', company:q.company||'',
+   email:q.email||'', phone:q.phone||'', course:q.course||'', seats:Number(q.seats||0), value:Number(q.value||0),
+   expectation:q.expectation||'', close:q.close||''
+ }));
+ return clean;
+}
+function loadRemoteData(){
+ if(!onlineEnabled()){ setSyncStatus('Local mode: Google Sheet URL is not configured.'); return Promise.resolve(); }
+ setSyncStatus('Loading shared data from Google Sheet...');
+ return jsonp('data').then(res=>{
+   if(!res || !res.ok) throw new Error((res&&res.error)||'Unknown Google Sheet error.');
+   state=normalizeRemoteData(res.data||{});
+   localStorage.setItem('fy26_27_emea_dashboard', JSON.stringify(state));
+   setSyncStatus('Online mode: shared Google Sheet data loaded. Last refresh: '+new Date().toLocaleString(), 'good');
+   renderAll();
+ }).catch(e=>{
+   setSyncStatus('Google Sheet sync issue: '+e.message+' Showing local browser data only.', 'bad');
+   renderAll();
+ });
+}
+function writeToSheet(action, record){
+ if(!onlineEnabled()) return Promise.resolve({ok:true,localOnly:true});
+ setSyncStatus('Saving to Google Sheet...');
+ return jsonp(action,{payload:JSON.stringify({record})}).then(res=>{
+   if(!res || !res.ok) throw new Error((res&&res.error)||'Save failed.');
+   setSyncStatus('Saved to Google Sheet. Refreshing shared data...', 'good');
+   return loadRemoteData();
+ }).catch(e=>{
+   setSyncStatus('Saved locally, but Google Sheet save failed: '+e.message, 'bad');
+   throw e;
+ });
+}
+function syncWeeklyEntry(name,tue){
+ if(!onlineEnabled()) return Promise.resolve();
+ const mem=TEAM.find(x=>x.name===name)||{};
+ const promises=threeMonthKeys(tue).map(k=>{
+   const u=getUpdate(name,tue,k);
+   const mo=MONTHS.find(m=>m.key===k)||{};
+   return jsonp('upsertWeekly',{payload:JSON.stringify({record:{
+     tue, region:mem.region||'', member:name, monthKey:k, monthLabel:mo.label||k,
+     sales:Number(u.sales||0), delivery:Number(u.delivery||0),
+     tentativeSales:Number(u.tentativeSales||0), tentativeDelivery:Number(u.tentativeDelivery||0), notes:u.notes||''
+   }})});
+ });
+ setSyncStatus('Saving weekly numbers to Google Sheet...');
+ return Promise.all(promises).then(results=>{
+   const bad=results.find(r=>!r || !r.ok);
+   if(bad) throw new Error(bad.error||'One weekly row failed to save.');
+   setSyncStatus('Weekly numbers saved to Google Sheet. Refreshing shared data...', 'good');
+   return loadRemoteData();
+ });
+}
+
+let state = load();
+function load(){
+ try{
+   let raw=localStorage.getItem('fy26_27_emea_dashboard');
+   let data=raw?JSON.parse(raw):{};
+   if(!data || typeof data!=='object') data={};
+   data.updates=data.updates && typeof data.updates==='object'?data.updates:{};
+   data.quotes=Array.isArray(data.quotes)?data.quotes:[];
+   return data;
+ }catch(e){return {updates:{},quotes:[]}}
+}
+function save(){localStorage.setItem('fy26_27_emea_dashboard', JSON.stringify(state)); renderAll();}
+function money(n){return CURRENCY+' '+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}
+function pct(a,b){return b?((a/b)*100):0}
+function fmtPct(a,b){return pct(a,b).toFixed(1)+'%'}
+function dateISO(d){return d.toISOString().slice(0,10)}
+function qTarget(member, qi){return member.q[qi]||0}
+function monthTarget(member, mkey){let m=MONTHS.find(x=>x.key===mkey); return m ? qTarget(member,m.q)/3 : 0}
+function halfTarget(member,h){return h===1 ? member.q[0]+member.q[1] : member.q[2]+member.q[3]}
+function regionList(){return ['Europe','Middle East','Africa']}
+function orderedRegionListWithEmea(){return ['EMEA',...regionList()]}
+function regionFilter(region){return region==='EMEA' ? (m=>true) : (m=>m.region===region)}
+function activeTuesday(){let today=new Date(); let d=new Date(today); d.setHours(0,0,0,0); if(d<FY_START) return dateISO(new Date(FY_START)); let day=d.getDay(); let diff=(day>=2)?day-2:day+5; d.setDate(d.getDate()-diff); if(d<FY_START) d=new Date(FY_START); return dateISO(d)}
+
+function latestSavedUpdateDate(){
+ let dates=[];
+ Object.keys(state.updates||{}).forEach(member=>{
+   Object.keys(state.updates[member]||{}).forEach(tue=>{
+     if(state.updates[member][tue] && Object.keys(state.updates[member][tue]).length) dates.push(tue);
+   });
+ });
+ dates.sort();
+ return dates.at(-1)||'';
+}
+function latestSavedQuotationDate(){
+ let dates=(state.quotes||[]).map(q=>q.tue).filter(Boolean).sort();
+ return dates.at(-1)||'';
+}
+function dashboardTuesday(){
+ let dates=[activeTuesday(),latestSavedUpdateDate(),latestSavedQuotationDate()].filter(Boolean).sort();
+ return dates.at(-1)||activeTuesday();
+}
+function countUpdatesForDate(tue){
+ let c=0;
+ Object.keys(state.updates||{}).forEach(member=>{
+   if(state.updates[member] && state.updates[member][tue]) c+=Object.keys(state.updates[member][tue]).length;
+ });
+ return c;
+}
+
+function currentMonthKeyFromTuesday(tue){let d=new Date(tue+'T00:00:00'); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function threeMonthKeys(tue=activeTuesday()){let start=currentMonthKeyFromTuesday(tue); let idx=MONTHS.findIndex(m=>m.key===start); if(idx<0) idx=0; return MONTHS.slice(idx,Math.min(idx+3,MONTHS.length)).map(m=>m.key)}
+function previousTuesday(tue){let d=new Date(tue+'T00:00:00'); d.setDate(d.getDate()-7); return dateISO(d)}
+function getUpdate(name,tue,mkey){return state.updates?.[name]?.[tue]?.[mkey] || {sales:0,delivery:0,tentativeSales:0,tentativeDelivery:0,notes:''}}
+function setUpdate(name,tue,mkey,val){state.updates[name]=state.updates[name]||{};state.updates[name][tue]=state.updates[name][tue]||{};state.updates[name][tue][mkey]=val}
+function latestTuesdayForMonth(name,mkey,upto=activeTuesday()){let all=Object.keys(state.updates?.[name]||{}).filter(t=>t<=upto && state.updates[name][t][mkey]); all.sort(); return all.at(-1)}
+function latestValue(name,mkey,type,upto=activeTuesday()){let t=latestTuesdayForMonth(name,mkey,upto); return t ? Number(getUpdate(name,t,mkey)[type]||0) : 0}
+function sumMembers(filterFn,mkeys,type,upto=activeTuesday()){return TEAM.filter(filterFn).reduce((s,mem)=>s+mkeys.reduce((a,m)=>a+latestValue(mem.name,m,type,upto),0),0)}
+function targetMembers(filterFn,mkeys){return TEAM.filter(filterFn).reduce((s,mem)=>s+mkeys.reduce((a,m)=>a+monthTarget(mem,m),0),0)}
+function annualTarget(filterFn){return TEAM.filter(filterFn).reduce((s,m)=>s+m.yearly,0)}
+function quarterKeys(qi){return MONTHS.filter(m=>m.q===qi).map(m=>m.key)}
+function halfKeys(h){return MONTHS.filter(m=>m.half===h).map(m=>m.key)}
+function ytdKeys(uptoMonthKey){return MONTHS.filter(m=>m.key<=uptoMonthKey).map(m=>m.key)}
+function card(label,value,sub='',cls=''){return `<div class="kpi"><div class="label">${label}</div><div class="value ${cls}">${value}</div><div class="sub">${sub}</div></div>`}
+function percentBadge(actual,target){let p=pct(actual,target); let cls=p>=100?'ok':p<70?'flag':'pill'; return `<span class="${cls}">${p.toFixed(1)}%</span>`}
+function achievementCell(actual,target){let p=pct(actual,target); let cls=p>=100?'goodbar':p<70?'badbar':''; return `<div><b>${money(actual)}</b> ${percentBadge(actual,target)}<div class="note">Target ${money(target)} | Gap ${money(actual-target)}</div><div class="progress"><div class="bar ${cls}" style="width:${Math.min(100,p)}%"></div></div></div>`}
+function reductionFlag(curr,prev,label){if(curr<prev)return `<span class="flag">${label} reduced by ${money(prev-curr)}</span>`; if(curr>prev)return `<span class="ok">Increased ${money(curr-prev)}</span>`; return `<span class="pill">No change</span>`}
+function targetByPeriod(filterFn, period, key){
+ if(period==='month') return targetMembers(filterFn,[key]);
+ if(period==='quarter') return targetMembers(filterFn,quarterKeys(key));
+ if(period==='half') return targetMembers(filterFn,halfKeys(key));
+ if(period==='annual') return annualTarget(filterFn);
+ return 0;
+}
+function actualByPeriod(filterFn, period, key, type='sales', upto=activeTuesday()){
+ if(period==='month') return sumMembers(filterFn,[key],type,upto);
+ if(period==='quarter') return sumMembers(filterFn,quarterKeys(key),type,upto);
+ if(period==='half') return sumMembers(filterFn,halfKeys(key),type,upto);
+ if(period==='annual') return sumMembers(filterFn,MONTHS.map(m=>m.key),type,upto);
+ return 0;
+}
+function periodRows(filterFn, upto=activeTuesday()){
+ let html='';
+ MONTHS.forEach(m=>{let s=sumMembers(filterFn,[m.key],'sales',upto), d=sumMembers(filterFn,[m.key],'delivery',upto), ts=sumMembers(filterFn,[m.key],'tentativeSales',upto), td=sumMembers(filterFn,[m.key],'tentativeDelivery',upto), t=targetMembers(filterFn,[m.key]); html+=`<tr><td>${m.label}</td><td>Month</td><td class="num">${money(t)}</td><td class="num">${money(s)}</td><td class="num">${money(d)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td><td>${percentBadge(d,t)}</td><td>${achievementCell(d,t)}</td></tr>`});
+ [0,1,2,3].forEach(q=>{let keys=quarterKeys(q), s=sumMembers(filterFn,keys,'sales',upto), d=sumMembers(filterFn,keys,'delivery',upto), ts=sumMembers(filterFn,keys,'tentativeSales',upto), td=sumMembers(filterFn,keys,'tentativeDelivery',upto), t=targetMembers(filterFn,keys); html+=`<tr><td><b>${QUARTERS[q]}</b></td><td>Quarter</td><td class="num">${money(t)}</td><td class="num">${money(s)}</td><td class="num">${money(d)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td><td>${percentBadge(d,t)}</td><td>${achievementCell(d,t)}</td></tr>`});
+ [1,2].forEach(h=>{let keys=halfKeys(h), s=sumMembers(filterFn,keys,'sales',upto), d=sumMembers(filterFn,keys,'delivery',upto), ts=sumMembers(filterFn,keys,'tentativeSales',upto), td=sumMembers(filterFn,keys,'tentativeDelivery',upto), t=targetMembers(filterFn,keys); html+=`<tr><td><b>H${h}</b></td><td>Half-Year</td><td class="num">${money(t)}</td><td class="num">${money(s)}</td><td class="num">${money(d)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td><td>${percentBadge(d,t)}</td><td>${achievementCell(d,t)}</td></tr>`});
+ let currentMonth=currentMonthKeyFromTuesday(upto), ykeys=ytdKeys(currentMonth), ys=sumMembers(filterFn,ykeys,'sales',upto), yd=sumMembers(filterFn,ykeys,'delivery',upto), yts=sumMembers(filterFn,ykeys,'tentativeSales',upto), ytdel=sumMembers(filterFn,ykeys,'tentativeDelivery',upto), yt=targetMembers(filterFn,ykeys);
+ html+=`<tr><td><b>YTD to ${MONTHS.find(m=>m.key===currentMonth)?.short||currentMonth}</b></td><td>YTD</td><td class="num">${money(yt)}</td><td class="num">${money(ys)}</td><td class="num">${money(yd)}</td><td class="num">${money(yts)}</td><td class="num">${money(ytdel)}</td><td>${percentBadge(yd,yt)}</td><td>${achievementCell(yd,yt)}</td></tr>`;
+ let as=sumMembers(filterFn,MONTHS.map(m=>m.key),'sales',upto), ad=sumMembers(filterFn,MONTHS.map(m=>m.key),'delivery',upto), ats=sumMembers(filterFn,MONTHS.map(m=>m.key),'tentativeSales',upto), atd=sumMembers(filterFn,MONTHS.map(m=>m.key),'tentativeDelivery',upto), at=annualTarget(filterFn);
+ html+=`<tr><td><b>FY26-27 Annual</b></td><td>Annual</td><td class="num">${money(at)}</td><td class="num">${money(as)}</td><td class="num">${money(ad)}</td><td class="num">${money(ats)}</td><td class="num">${money(atd)}</td><td>${percentBadge(ad,at)}</td><td>${achievementCell(ad,at)}</td></tr>`;
+ return html;
+}
+function fullPeriodTable(title, filterFn, upto=activeTuesday()){
+ return `<div class="card"><h3>${title}</h3><table><thead><tr><th>Period</th><th>Type</th><th>Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Delivery %</th><th>Delivery Achievement</th></tr></thead><tbody>${periodRows(filterFn,upto)}</tbody></table></div>`;
+}
+
+function separatedAchievementTables(titlePrefix, filterFn, upto=activeTuesday()){
+ let monthlyRows='';
+ MONTHS.forEach(m=>{
+   let keys=[m.key], target=targetMembers(filterFn,keys), sales=sumMembers(filterFn,keys,'sales',upto), delivery=sumMembers(filterFn,keys,'delivery',upto), ts=sumMembers(filterFn,keys,'tentativeSales',upto), td=sumMembers(filterFn,keys,'tentativeDelivery',upto);
+   monthlyRows+=`<tr><td>${m.label}</td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td>${achievementCell(delivery,target)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+ });
+ let quarterlyRows='';
+ [0,1,2,3].forEach(q=>{
+   let keys=quarterKeys(q), target=targetMembers(filterFn,keys), sales=sumMembers(filterFn,keys,'sales',upto), delivery=sumMembers(filterFn,keys,'delivery',upto), ts=sumMembers(filterFn,keys,'tentativeSales',upto), td=sumMembers(filterFn,keys,'tentativeDelivery',upto);
+   quarterlyRows+=`<tr><td><b>${QUARTERS[q]}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td>${achievementCell(delivery,target)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+ });
+ let halfRows='';
+ [1,2].forEach(h=>{
+   let keys=halfKeys(h), target=targetMembers(filterFn,keys), sales=sumMembers(filterFn,keys,'sales',upto), delivery=sumMembers(filterFn,keys,'delivery',upto), ts=sumMembers(filterFn,keys,'tentativeSales',upto), td=sumMembers(filterFn,keys,'tentativeDelivery',upto);
+   halfRows+=`<tr><td><b>H${h}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td>${achievementCell(delivery,target)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+ });
+ let currentMonth=currentMonthKeyFromTuesday(upto), ykeys=ytdKeys(currentMonth), yTarget=targetMembers(filterFn,ykeys), ySales=sumMembers(filterFn,ykeys,'sales',upto), yDelivery=sumMembers(filterFn,ykeys,'delivery',upto), yTs=sumMembers(filterFn,ykeys,'tentativeSales',upto), yTd=sumMembers(filterFn,ykeys,'tentativeDelivery',upto);
+ let ytdRows=`<tr><td><b>YTD to ${MONTHS.find(m=>m.key===currentMonth)?.short||currentMonth}</b></td><td class="num">${money(yTarget)}</td><td class="num">${money(ySales)}</td><td class="num"><b>${money(yDelivery)}</b></td><td>${percentBadge(yDelivery,yTarget)}</td><td>${achievementCell(yDelivery,yTarget)}</td><td class="num">${money(yTs)}</td><td class="num">${money(yTd)}</td></tr>`;
+ let akeys=MONTHS.map(m=>m.key), aTarget=annualTarget(filterFn), aSales=sumMembers(filterFn,akeys,'sales',upto), aDelivery=sumMembers(filterFn,akeys,'delivery',upto), aTs=sumMembers(filterFn,akeys,'tentativeSales',upto), aTd=sumMembers(filterFn,akeys,'tentativeDelivery',upto);
+ let annualRows=`<tr><td><b>FY26-27 Annual</b></td><td class="num">${money(aTarget)}</td><td class="num">${money(aSales)}</td><td class="num"><b>${money(aDelivery)}</b></td><td>${percentBadge(aDelivery,aTarget)}</td><td>${achievementCell(aDelivery,aTarget)}</td><td class="num">${money(aTs)}</td><td class="num">${money(aTd)}</td></tr>`;
+ const table=(heading, rows)=>`<div class="card"><h3>${heading}</h3><table><thead><tr><th>Period</th><th>Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Delivery %</th><th>Delivery Achievement</th><th>Tentative Sales</th><th>Tentative Delivery</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+ return table(`${titlePrefix} Monthly % Achievement`, monthlyRows)+table(`${titlePrefix} Quarterly % Achievement`, quarterlyRows)+table(`${titlePrefix} Half-Year % Achievement`, halfRows)+table(`${titlePrefix} YTD % Achievement`, ytdRows)+table(`${titlePrefix} Annual % Achievement`, annualRows);
+}
+
+function renderManager(){let t=dashboardTuesday(), prev=previousTuesday(t); let mkeys=threeMonthKeys(t); let all=()=>true; let sales=sumMembers(all,mkeys,'sales',t), del=sumMembers(all,mkeys,'delivery',t), tar=targetMembers(all,mkeys); let annual=annualTarget(all); let ytd=ytdKeys(mkeys[0]); let ytdSales=sumMembers(all,ytd,'sales',t), ytdTar=targetMembers(all,ytd);
+ let html=currentMonthSummary('EMEA Current Month Snapshot', all, t); html+=`<div class="card"><div class="section-title"><h2>EMEA Dashboard</h2><span class="pill">Current update date: ${t}</span></div><p class="note">Shows latest projections for the current month and next two months: ${mkeys.map(k=>MONTHS.find(m=>m.key===k).label).join(', ')}. Percentages are calculated against target.</p><div class="grid">${card('3-Month Sales Projection',money(sales),'Target '+money(tar))}${card('3-Month Delivery Projection',money(del),'Delivery achievement '+fmtPct(del,tar),del>=tar?'good':'bad')}${card('YTD Delivery Achievement',money(sumMembers(all,ytd,'delivery',t)),fmtPct(sumMembers(all,ytd,'delivery',t),ytdTar)+' of YTD target '+money(ytdTar))}${card('Annual EMEA Target',money(annual),'Delivery FY achievement '+fmtPct(sumMembers(all,MONTHS.map(m=>m.key),'delivery',t),annual))}</div></div>`;
+ html+=`<div class="card"><h3>Region Comparison</h3><table><thead><tr><th>Region</th><th>Members</th><th>Sales Projection</th><th>Delivery vs Target</th><th>Delivery %</th><th>Week vs Previous Week</th></tr></thead><tbody>`;
+ regionList().forEach(r=>{let fn=m=>m.region===r; let rs=sumMembers(fn,mkeys,'sales',t), rd=sumMembers(fn,mkeys,'delivery',t), rt=targetMembers(fn,mkeys); let prevSales=TEAM.filter(fn).reduce((s,mem)=>s+mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).sales||0),0),0); let prevDel=TEAM.filter(fn).reduce((s,mem)=>s+mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).delivery||0),0),0); html+=`<tr><td><b>${r}</b></td><td>${TEAM.filter(fn).map(x=>x.name).join(', ')}</td><td class="num"><b>${money(rs)}</b><br><span class="smalltext">Target ${money(rt)}</span></td><td>${achievementCell(rd,rt)}</td><td>${percentBadge(rd,rt)}</td><td>${reductionFlag(rs,prevSales,r+' sales')}<br>${reductionFlag(rd,prevDel,r+' delivery')}</td></tr>`});
+ html+=`</tbody></table></div>`;
+ html+=`<div class="card"><h3>Individual Comparison</h3><table><thead><tr><th>Member</th><th>Region</th><th>3-Month Sales</th><th>3-Month Delivery vs Target</th><th>Monthly / Quarterly / Half-Year / Annual Delivery %</th><th>Flag</th></tr></thead><tbody>`;
+ TEAM.forEach(mem=>{let fn=x=>x.name===mem.name; let ms=sumMembers(fn,mkeys,'sales',t), md=sumMembers(fn,mkeys,'delivery',t), mt=targetMembers(fn,mkeys); let prevSales=mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).sales||0),0); let prevDel=mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).delivery||0),0); let cm=mkeys[0], q=MONTHS.find(x=>x.key===cm).q, h=MONTHS.find(x=>x.key===cm).half; html+=`<tr><td><b>${mem.name}</b></td><td>${mem.region}</td><td class="num"><b>${money(ms)}</b><br><span class="smalltext">Target ${money(mt)}</span></td><td>${achievementCell(md,mt)}</td><td>Month: ${money(monthTarget(mem,cm))} | ${fmtPct(latestValue(mem.name,cm,'delivery',t),monthTarget(mem,cm))}<br>Quarter: ${money(qTarget(mem,q))} | ${fmtPct(actualByPeriod(fn,'quarter',q,'delivery',t),qTarget(mem,q))}<br>Half-year: ${money(halfTarget(mem,h))} | ${fmtPct(actualByPeriod(fn,'half',h,'delivery',t),halfTarget(mem,h))}<br>Annual: ${money(mem.yearly)} | ${fmtPct(actualByPeriod(fn,'annual',0,'delivery',t),mem.yearly)}</td><td>${reductionFlag(ms,prevSales,'Sales')}<br>${reductionFlag(md,prevDel,'Delivery')}</td></tr>`});
+ html+=`</tbody></table></div>`; html+=separatedAchievementTables('EMEA', all, t); document.getElementById('manager').innerHTML=html;}
+function regionMemberRows(fn,t,prev,mkeys){return TEAM.filter(fn).map(mem=>{let mf=x=>x.name===mem.name, s=sumMembers(mf,mkeys,'sales',t), d=sumMembers(mf,mkeys,'delivery',t), ts=sumMembers(mf,mkeys,'tentativeSales',t), td=sumMembers(mf,mkeys,'tentativeDelivery',t), mt=targetMembers(mf,mkeys); let prevSales=mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).sales||0),0); let prevDel=mkeys.reduce((a,m)=>a+Number(getUpdate(mem.name,prev,m).delivery||0),0); return `<tr><td><b>${mem.name}</b></td><td class="num">${money(mt)}</td><td class="num">${money(s)}</td><td class="num"><b>${money(d)}</b></td><td>${percentBadge(d,mt)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td><td>${reductionFlag(s,prevSales,'Sales')}<br>${reductionFlag(d,prevDel,'Delivery')}</td></tr>`}).join('')}
+function regionTotalRow(label,fn,t,mkeys){let rt=targetMembers(fn,mkeys), rd=sumMembers(fn,mkeys,'delivery',t), rs=sumMembers(fn,mkeys,'sales',t), rts=sumMembers(fn,mkeys,'tentativeSales',t), rtd=sumMembers(fn,mkeys,'tentativeDelivery',t); return `<tr><td><b>${label}</b></td><td class="num"><b>${money(rt)}</b></td><td class="num"><b>${money(rs)}</b></td><td class="num"><b>${money(rd)}</b></td><td>${percentBadge(rd,rt)}</td><td class="num"><b>${money(rts)}</b></td><td class="num"><b>${money(rtd)}</b></td><td></td></tr>`}
+function currentMonthSummary(title,fn,t=activeTuesday()){let cm=threeMonthKeys(t)[0], mo=MONTHS.find(m=>m.key===cm), prev=previousTuesday(t); let tar=targetMembers(fn,[cm]), sales=sumMembers(fn,[cm],'sales',t), del=sumMembers(fn,[cm],'delivery',t), ts=sumMembers(fn,[cm],'tentativeSales',t), td=sumMembers(fn,[cm],'tentativeDelivery',t); let ps=sumMembers(fn,[cm],'sales',prev), pd=sumMembers(fn,[cm],'delivery',prev); let rows=TEAM.filter(fn).map(mem=>{let mf=x=>x.name===mem.name, mt=monthTarget(mem,cm), s=latestValue(mem.name,cm,'sales',t), d=latestValue(mem.name,cm,'delivery',t), ltw=latestTuesdayForMonth(mem.name,cm,t)||'-'; return `<tr><td><b>${mem.name}</b></td><td>${mem.region}</td><td class="num">${money(mt)}</td><td class="num">${money(s)}</td><td class="num"><b>${money(d)}</b></td><td>${percentBadge(d,mt)}</td><td class="num">${money(latestValue(mem.name,cm,'tentativeSales',t))}</td><td class="num">${money(latestValue(mem.name,cm,'tentativeDelivery',t))}</td><td>${ltw}</td></tr>`}).join(''); return `<div class="card"><div class="section-title"><h2>${title}: ${mo.label}</h2><span class="pill">Current month shown first</span></div><div class="grid">${card('Current Month Target',money(tar),'')}${card('Current Month Sales',money(sales),reductionFlag(sales,ps,'Sales'))}${card('Current Month Delivery',money(del),'Delivery achievement '+fmtPct(del,tar),del>=tar?'good':'bad')}${card('Current Month Tentative',money(ts+td),'Sales '+money(ts)+' | Delivery '+money(td))}</div><table style="margin-top:12px"><thead><tr><th>Member</th><th>Region</th><th>Month Target</th><th>Sales</th><th>Delivery</th><th>Delivery %</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Latest Update</th></tr></thead><tbody>${rows}<tr><td><b>Total</b></td><td></td><td class="num"><b>${money(tar)}</b></td><td class="num"><b>${money(sales)}</b></td><td class="num"><b>${money(del)}</b></td><td>${percentBadge(del,tar)}</td><td class="num"><b>${money(ts)}</b></td><td class="num"><b>${money(td)}</b></td><td>${reductionFlag(del,pd,'Delivery')}</td></tr></tbody></table></div>`}
+function regionTable(title,fn,t,prev,mkeys){let rt=targetMembers(fn,mkeys), rd=sumMembers(fn,mkeys,'delivery',t); return `<div class="card"><div class="section-title"><h2>${title}</h2><span class="pill">Delivery Achievement ${fmtPct(rd,rt)}</span></div><table><thead><tr><th>Member</th><th>3-Month Target</th><th>Sales</th><th>Delivery</th><th>Delivery %</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Flag</th></tr></thead><tbody>${regionMemberRows(fn,t,prev,mkeys)}${regionTotalRow(title+' Total',fn,t,mkeys)}</tbody></table></div>`}
+function renderRegions(){let t=dashboardTuesday(), prev=previousTuesday(t), mkeys=threeMonthKeys(t), allFn=m=>true, html=`<div class="card"><div class="section-title"><h2>Region Dashboards</h2><span class="pill">EMEA | Europe | Middle East | Africa</span></div><p class="note">Region dashboards are simplified: member numbers, delivery achievement %, and EMEA total team numbers. Percentages are based on delivery against target.</p></div>`; html+=currentMonthSummary('EMEA Current Month Snapshot', allFn, t);
+ html+=regionTable('EMEA Total Team', allFn, t, prev, mkeys);
+ regionList().forEach(r=>{let fn=m=>m.region===r; html+=regionTable(r, fn, t, prev, mkeys);});
+ document.getElementById('regions').innerHTML=html;}
+
+function qytdQuarterRows(filterFn,t=dashboardTuesday()){
+ let rows='';
+ [0,1,2,3].forEach(q=>{
+   let keys=quarterKeys(q), target=targetMembers(filterFn,keys), sales=sumMembers(filterFn,keys,'sales',t), delivery=sumMembers(filterFn,keys,'delivery',t), ts=sumMembers(filterFn,keys,'tentativeSales',t), td=sumMembers(filterFn,keys,'tentativeDelivery',t);
+   rows+=`<tr><td><b>${QUARTERS[q]}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td class="num">${money(target-delivery)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+ });
+ return rows;
+}
+function qytdRegionRows(t=dashboardTuesday()){
+ let cm=currentMonthKeyFromTuesday(t), ykeys=ytdKeys(cm), rows='';
+ [['EMEA Total',x=>true],...regionList().map(r=>[r,x=>x.region===r])].forEach(([label,fn])=>{
+   let target=targetMembers(fn,ykeys), sales=sumMembers(fn,ykeys,'sales',t), delivery=sumMembers(fn,ykeys,'delivery',t), ts=sumMembers(fn,ykeys,'tentativeSales',t), td=sumMembers(fn,ykeys,'tentativeDelivery',t);
+   rows+=`<tr><td><b>${label}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td class="num">${money(target-delivery)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+ });
+ return rows;
+}
+function renderQYTD(){
+ let t=dashboardTuesday(), cm=currentMonthKeyFromTuesday(t), currentMonth=MONTHS.find(m=>m.key===cm)||MONTHS[0], currentQ=currentMonth.q, all=x=>true;
+ let qKeys=quarterKeys(currentQ), yKeys=ytdKeys(cm), fyKeys=MONTHS.map(m=>m.key);
+ let qTarget=targetMembers(all,qKeys), qSales=sumMembers(all,qKeys,'sales',t), qDelivery=sumMembers(all,qKeys,'delivery',t), qTs=sumMembers(all,qKeys,'tentativeSales',t), qTd=sumMembers(all,qKeys,'tentativeDelivery',t);
+ let yTarget=targetMembers(all,yKeys), ySales=sumMembers(all,yKeys,'sales',t), yDelivery=sumMembers(all,yKeys,'delivery',t), yTs=sumMembers(all,yKeys,'tentativeSales',t), yTd=sumMembers(all,yKeys,'tentativeDelivery',t);
+ let annual=annualTarget(all), fyDelivery=sumMembers(all,fyKeys,'delivery',t), requiredAnnual=Math.max(0,annual-fyDelivery), requiredYTD=Math.max(0,yTarget-yDelivery);
+ let html=`<div class="card"><div class="section-title"><h2>Quarterly / Half-Year / YTD / Annual Dashboard</h2><span class="pill">Update date: ${t}</span></div><p class="note">This single dashboard combines Quarterly, Half-Year, YTD, and Annual numbers. Achievement % is based on Delivery vs Target.</p><div class="grid">${card('Current Quarter',QUARTERS[currentQ],'Target '+money(qTarget))}${card('Quarter Delivery',money(qDelivery),fmtPct(qDelivery,qTarget)+' achieved',qDelivery>=qTarget?'good':'bad')}${card('YTD Delivery',money(yDelivery),fmtPct(yDelivery,yTarget)+' of YTD target '+money(yTarget),yDelivery>=yTarget?'good':'bad')}${card('Annual Required Balance',money(requiredAnnual),'Remaining delivery required to reach annual target')}</div></div>`;
+ html+=`<div class="card"><h3>EMEA Quarterly Numbers</h3><table><thead><tr><th>Quarter</th><th>Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Delivery %</th><th>Delivery Gap</th><th>Tentative Sales</th><th>Tentative Delivery</th></tr></thead><tbody>${qytdQuarterRows(all,t)}</tbody></table></div>`;
+ html+=`<div class="card"><h3>EMEA YTD Numbers</h3><div class="grid3">${card('YTD Period','July 2026 to '+currentMonth.label,'')}${card('YTD Target',money(yTarget),'')}${card('YTD Sales Projection',money(ySales),'')}${card('YTD Delivery Projection',money(yDelivery),'Achievement '+fmtPct(yDelivery,yTarget),yDelivery>=yTarget?'good':'bad')}${card('Required for YTD Target',money(requiredYTD),'Shortfall vs YTD target')}${card('YTD Tentative',money(yTs+yTd),'Sales '+money(yTs)+' | Delivery '+money(yTd))}</div><table style="margin-top:12px"><thead><tr><th>Scope</th><th>YTD Target</th><th>YTD Sales</th><th>YTD Delivery</th><th>Delivery %</th><th>Delivery Gap</th><th>Tentative Sales</th><th>Tentative Delivery</th></tr></thead><tbody>${qytdRegionRows(t)}</tbody></table></div>`;
+ html+=`<div class="card"><h3>Half-Year and Annual Summary</h3><table><thead><tr><th>Period</th><th>Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Delivery %</th><th>Delivery Gap</th><th>Tentative Sales</th><th>Tentative Delivery</th></tr></thead><tbody>`;
+ [1,2].forEach(h=>{let keys=halfKeys(h), target=targetMembers(all,keys), sales=sumMembers(all,keys,'sales',t), delivery=sumMembers(all,keys,'delivery',t), ts=sumMembers(all,keys,'tentativeSales',t), td=sumMembers(all,keys,'tentativeDelivery',t); html+=`<tr><td><b>H${h}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td class="num">${money(target-delivery)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;});
+ let fySales=sumMembers(all,fyKeys,'sales',t), fyTs=sumMembers(all,fyKeys,'tentativeSales',t), fyTd=sumMembers(all,fyKeys,'tentativeDelivery',t); html+=`<tr><td><b>FY26-27 Annual</b></td><td class="num">${money(annual)}</td><td class="num">${money(fySales)}</td><td class="num"><b>${money(fyDelivery)}</b></td><td>${percentBadge(fyDelivery,annual)}</td><td class="num">${money(annual-fyDelivery)}</td><td class="num">${money(fyTs)}</td><td class="num">${money(fyTd)}</td></tr>`;
+ html+=`</tbody></table></div>`;
+ document.getElementById('qytd').innerHTML=html;
+}
+
+function renderEntry(){let t=activeTuesday(); let html=`<div class="card"><h2>Weekly Tuesday Entry</h2><p class="note"><b>This is now the first/default dashboard.</b> Enter projections for ${t}. Each Tuesday is saved separately so this week can be compared against the previous Tuesday.</p><div class="form-row small"><div><label>Team Member</label><select id="entryMember">${TEAM.map(x=>`<option>${x.name}</option>`).join('')}</select></div><div><label>Tuesday Date</label><input type="date" id="entryTue" value="${t}"></div><div><label>Region</label><input id="entryRegion" readonly></div><div style="align-self:end"><button onclick="loadEntryForm()">Load</button></div></div><div id="entryForms"></div></div>`; document.getElementById('entry').innerHTML=html; document.getElementById('entryMember').addEventListener('change',loadEntryForm); document.getElementById('entryTue').addEventListener('change',loadEntryForm); loadEntryForm();}
+window.loadEntryForm=function(){let name=document.getElementById('entryMember').value, tue=document.getElementById('entryTue').value; let mem=TEAM.find(x=>x.name===name); document.getElementById('entryRegion').value=mem.region; let mkeys=threeMonthKeys(tue); let html='<table><thead><tr><th>Month</th><th>Monthly Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Delivery %</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Notes</th><th>Last Week Difference</th></tr></thead><tbody>'; mkeys.forEach(k=>{let u=getUpdate(name,tue,k), pu=getUpdate(name,previousTuesday(tue),k), mt=monthTarget(mem,k); html+=`<tr><td><b>${MONTHS.find(m=>m.key===k).label}</b></td><td>${money(mt)}</td><td><input type="number" id="sales_${k}" value="${u.sales||''}" min="0"></td><td><input type="number" id="del_${k}" value="${u.delivery||''}" min="0"></td><td>${percentBadge(Number(u.delivery||0),mt)}</td><td><input type="number" id="tsales_${k}" value="${u.tentativeSales||''}" min="0"></td><td><input type="number" id="tdel_${k}" value="${u.tentativeDelivery||''}" min="0"></td><td><textarea id="notes_${k}">${u.notes||''}</textarea></td><td>Sales: ${reductionFlag(Number(u.sales||0),Number(pu.sales||0),'Sales')}<br>Delivery: ${reductionFlag(Number(u.delivery||0),Number(pu.delivery||0),'Delivery')}</td></tr>`}); html+='</tbody></table><div class="actions"><button onclick="saveEntryForm()">Save Weekly Numbers</button></div>'; document.getElementById('entryForms').innerHTML=html;}
+window.saveEntryForm=function(){let name=document.getElementById('entryMember').value, tue=document.getElementById('entryTue').value; threeMonthKeys(tue).forEach(k=>setUpdate(name,tue,k,{sales:Number(document.getElementById('sales_'+k).value||0),delivery:Number(document.getElementById('del_'+k).value||0),tentativeSales:Number(document.getElementById('tsales_'+k).value||0),tentativeDelivery:Number(document.getElementById('tdel_'+k).value||0),notes:document.getElementById('notes_'+k).value||''})); localStorage.setItem('fy26_27_emea_dashboard', JSON.stringify(state)); renderAll(); syncWeeklyEntry(name,tue).then(()=>alert('Saved for '+name+' on '+tue+(onlineEnabled()?' in Google Sheet.':' locally.'))).catch(e=>alert('Saved locally, but Google Sheet sync failed: '+e.message));}
+function renderIndividual(){let html=`<div class="card"><h2>Individual Dashboard</h2><div class="form-row small"><div><label>Team Member</label><select id="indMember" onchange="drawIndividual()">${TEAM.map(x=>`<option>${x.name}</option>`).join('')}</select></div><div><label>View From Tuesday</label><input type="date" id="indTue" value="${dashboardTuesday()}" onchange="drawIndividual()"></div></div><div id="indBody"></div></div>`; document.getElementById('individual').innerHTML=html; setTimeout(drawIndividual,0)}
+window.drawIndividual=function(){let name=document.getElementById('indMember').value,t=document.getElementById('indTue').value,mem=TEAM.find(x=>x.name===name),fn=m=>m.name===name,mkeys=threeMonthKeys(t); let sales=sumMembers(fn,mkeys,'sales',t), target=targetMembers(fn,mkeys), annual=mem.yearly, fySales=sumMembers(fn,MONTHS.map(m=>m.key),'sales',t); let html=currentMonthSummary(name+' Current Month Snapshot', fn, t); html+=`<div class="grid3">${card('Region',mem.region,'')}${card('3-Month Sales',money(sales),'Target '+money(target))}${card('Annual Target',money(annual),'Delivery FY achievement '+fmtPct(sumMembers(fn,MONTHS.map(m=>m.key),'delivery',t),annual))}</div>`; html+=fullPeriodTable(name+' Monthly, Quarterly, Half-Year, YTD and Annual % Achievement', fn, t); html+=`<div class="card"><h3>${name} Monthly Detail</h3><table><thead><tr><th>Month</th><th>Target</th><th>Sales Projection</th><th>Delivery Projection</th><th>Delivery %</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Latest Tuesday</th></tr></thead><tbody>`; MONTHS.forEach(m=>{let s=latestValue(name,m.key,'sales',t),d=latestValue(name,m.key,'delivery',t),mt=monthTarget(mem,m.key), lt=latestTuesdayForMonth(name,m.key,t)||'-'; html+=`<tr><td>${m.label}</td><td>${money(mt)}</td><td class="num">${money(s)}</td><td class="num">${money(d)}</td><td>${percentBadge(d,mt)}</td><td class="num">${money(latestValue(name,m.key,'tentativeSales',t))}</td><td class="num">${money(latestValue(name,m.key,'tentativeDelivery',t))}</td><td>${lt}</td></tr>`}); html+=`</tbody></table></div>`; document.getElementById('indBody').innerHTML=html;}
+
+function renderWeeklyRegion(){
+ let defaultTue=dashboardTuesday();
+ let html=`<div class="card"><div class="section-title"><h2>Weekly Regional Update Dashboard</h2><span class="pill">For Wednesday morning review</span></div><p class="note">This dashboard shows the latest weekly update by region for the selected Tuesday. Use it every Wednesday morning to capture what each region updated this week, including quotation count and quotation value.</p><div class="form-row small"><div><label>Weekly Update Tuesday</label><input type="date" id="wrTue" value="${defaultTue}" onchange="drawWeeklyRegion()"></div><div style="align-self:end"><button onclick="drawWeeklyRegion()">Refresh Weekly Region Numbers</button></div></div><div id="weeklyRegionBody"></div></div>`;
+ document.getElementById('weeklyRegion').innerHTML=html;
+ setTimeout(drawWeeklyRegion,0);
+}
+window.drawWeeklyRegion=function(){
+ let tue=document.getElementById('wrTue')?.value || dashboardTuesday();
+ let prev=previousTuesday(tue);
+ let mkeys=threeMonthKeys(tue);
+ let quoteForRegion=(region)=> (state.quotes||[]).filter(q=>q.tue===tue && (region==='EMEA' || (TEAM.find(m=>m.name===q.member)?.region===region)));
+ let rows=orderedRegionListWithEmea().map(region=>{
+   let fn=regionFilter(region);
+   let target=targetMembers(fn,mkeys);
+   let sales=sumMembers(fn,mkeys,'sales',tue);
+   let delivery=sumMembers(fn,mkeys,'delivery',tue);
+   let ts=sumMembers(fn,mkeys,'tentativeSales',tue);
+   let td=sumMembers(fn,mkeys,'tentativeDelivery',tue);
+   let ps=sumMembers(fn,mkeys,'sales',prev);
+   let pd=sumMembers(fn,mkeys,'delivery',prev);
+   let quotes=quoteForRegion(region);
+   let qValue=quotes.reduce((a,q)=>a+Number(q.value||0),0);
+   let high=quotes.filter(q=>q.expectation==='High').length;
+   return `<tr><td><b>${region}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td>${reductionFlag(sales,ps,'Sales')}</td><td class="num"><b>${money(delivery)}</b></td><td>${percentBadge(delivery,target)}</td><td>${reductionFlag(delivery,pd,'Delivery')}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td><td class="num"><b>${quotes.length}</b></td><td class="num"><b>${money(qValue)}</b></td><td class="num">${high}</td></tr>`;
+ }).join('');
+ let monthBlocks=mkeys.map(mkey=>{
+   let month=MONTHS.find(m=>m.key===mkey);
+   let body=orderedRegionListWithEmea().map(region=>{
+     let fn=regionFilter(region);
+     let target=targetMembers(fn,[mkey]);
+     let sales=sumMembers(fn,[mkey],'sales',tue);
+     let delivery=sumMembers(fn,[mkey],'delivery',tue);
+     let ts=sumMembers(fn,[mkey],'tentativeSales',tue);
+     let td=sumMembers(fn,[mkey],'tentativeDelivery',tue);
+     return `<tr><td><b>${region}</b></td><td class="num">${money(target)}</td><td class="num">${money(sales)}</td><td class="num">${money(delivery)}</td><td>${percentBadge(delivery,target)}</td><td class="num">${money(ts)}</td><td class="num">${money(td)}</td></tr>`;
+   }).join('');
+   return `<div class="card"><h3>${month.label} - Regional Weekly Projection</h3><table><thead><tr><th>Region</th><th>Target</th><th>Sales</th><th>Delivery</th><th>Delivery %</th><th>Tentative Sales</th><th>Tentative Delivery</th></tr></thead><tbody>${body}</tbody></table></div>`;
+ }).join('');
+ let qRows=(state.quotes||[]).filter(q=>q.tue===tue).map(q=>`<tr><td>${TEAM.find(m=>m.name===q.member)?.region||''}</td><td>${q.member}</td><td><b>${q.customer}</b><br>${q.company}</td><td>${q.course}</td><td class="num">${q.seats}</td><td class="num">${money(q.value)}</td><td>${q.expectation}</td><td>${q.close}</td></tr>`).join('') || '<tr><td colspan="8">No quotations entered for this week.</td></tr>';
+ document.getElementById('weeklyRegionBody').innerHTML=`<div class="card"><h3>Weekly Region Summary - ${tue}</h3><table><thead><tr><th>Region</th><th>3-Month Target</th><th>Sales</th><th>Sales vs Last Week</th><th>Delivery</th><th>Delivery %</th><th>Delivery vs Last Week</th><th>Tentative Sales</th><th>Tentative Delivery</th><th>Quotations Sent</th><th>Quotation Value</th><th>High Expectation</th></tr></thead><tbody>${rows}</tbody></table></div>${monthBlocks}<div class="card"><h3>Quotation Details Sent This Week - ${tue}</h3><table><thead><tr><th>Region</th><th>Member</th><th>Customer / Company</th><th>Course</th><th>Seats</th><th>Value</th><th>Expectation</th><th>Expected Close</th></tr></thead><tbody>${qRows}</tbody></table></div>`;
+}
+
+function chartHBar(title, desc, rows, valueFormatter=money, capAt100=false){
+ let max=Math.max(1,...rows.map(r=>Number(r.value||0)),...rows.map(r=>Number(r.target||0)));
+ return `<div class="chart-card"><h3>${title}</h3><div class="desc">${desc}</div>`+rows.map(r=>{
+   let val=Number(r.value||0), target=Number(r.target||0), width=capAt100?Math.min(100,val):Math.min(100,(val/max)*100);
+   let cls=r.cls||'';
+   let sub=r.sub?`<div class="smalltext">${r.sub}</div>`:'';
+   return `<div class="chart-row"><div class="chart-label">${r.label}${sub}</div><div class="chart-track"><div class="chart-fill ${cls}" style="width:${width}%"></div></div><div class="chart-value">${valueFormatter(val)}${target?`<br><span class="smalltext">Target ${money(target)}</span>`:''}</div></div>`;
+ }).join('')+`</div>`;
+}
+function chartGrouped(title, desc, labels, series){
+ let max=Math.max(1,...series.flatMap(s=>s.values.map(v=>Number(v||0))));
+ let cols=labels.map((lab,i)=>`<div class="chart-col">${series.map(s=>`<div class="chart-bar ${s.cls||''}" title="${s.label}: ${money(s.values[i]||0)}" style="height:${Math.max(2,((s.values[i]||0)/max)*135)}px"></div>`).join('')}</div>`).join('');
+ let axis=labels.map(l=>`<span>${l}</span>`).join('');
+ let legend=series.map(s=>`<span><i class="${s.cls||'sales'}"></i>${s.label}</span>`).join('');
+ let exact=`<table class="chart-data"><thead><tr><th>Item</th>${series.map(s=>`<th class="num">${s.label}</th>`).join('')}</tr></thead><tbody>${labels.map((lab,i)=>`<tr><td>${lab}</td>${series.map(s=>`<td class="num"><b>${money(s.values[i]||0)}</b></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+ return `<div class="chart-card"><h3>${title}</h3><div class="desc">${desc}</div><div class="chart-mini">${cols}</div><div class="chart-axis">${axis}</div><div class="legend">${legend}</div>${exact}</div>`;
+}
+function renderCharts(){
+ let t=dashboardTuesday(), latestUpdate=latestSavedUpdateDate(), latestQuote=latestSavedQuotationDate(), mkey=currentMonthKeyFromTuesday(t), month=MONTHS.find(m=>m.key===mkey)||MONTHS[0], mkeys=threeMonthKeys(t);
+ let all=x=>true;
+ let regionRows=regionList().map(r=>{let fn=regionFilter(r), target=targetMembers(fn,[mkey]), sales=sumMembers(fn,[mkey],'sales',t), delivery=sumMembers(fn,[mkey],'delivery',t), ts=sumMembers(fn,[mkey],'tentativeSales',t), td=sumMembers(fn,[mkey],'tentativeDelivery',t); return {region:r,target,sales,delivery,ts,td,pct:pct(delivery,target)};});
+ let emeaCurrent={target:targetMembers(all,[mkey]), sales:sumMembers(all,[mkey],'sales',t), delivery:sumMembers(all,[mkey],'delivery',t), ts:sumMembers(all,[mkey],'tentativeSales',t), td:sumMembers(all,[mkey],'tentativeDelivery',t)};
+ let qRows=[0,1,2,3].map(q=>{let keys=quarterKeys(q), target=targetMembers(all,keys), delivery=sumMembers(all,keys,'delivery',t);return {label:'Q'+(q+1),value:pct(delivery,target),sub:`${money(delivery)} / ${money(target)}`,cls:pct(delivery,target)>=100?'delivery':pct(delivery,target)<70?'badfill':'warnfill'};});
+ let memberRows=TEAM.map(mem=>{let target=annualTarget(x=>x.name===mem.name), delivery=sumMembers(x=>x.name===mem.name,MONTHS.map(m=>m.key),'delivery',t); return {label:mem.name,value:pct(delivery,target),sub:`${mem.region} | ${money(delivery)} / ${money(target)}`,cls:pct(delivery,target)>=100?'delivery':pct(delivery,target)<70?'badfill':'warnfill'};});
+ let quoteRegions=regionList().map(r=>{let qs=(state.quotes||[]).filter(q=>q.tue===t && (TEAM.find(m=>m.name===q.member)||{}).region===r);return {label:r,value:qs.reduce((a,q)=>a+Number(q.value||0),0),sub:`${qs.length} quotations`,cls:''};});
+ let threeLabels=mkeys.map(k=>(MONTHS.find(m=>m.key===k)||{}).short||k);
+ let targetVals=mkeys.map(k=>targetMembers(all,[k])), salesVals=mkeys.map(k=>sumMembers(all,[k],'sales',t)), delVals=mkeys.map(k=>sumMembers(all,[k],'delivery',t));
+ let chartQuoteCount=(state.quotes||[]).filter(q=>q.tue===t).length;
+ let html=`<div class="presentation-title"><h2>Presentation Charts Dashboard</h2><p>Update date: ${t}. Charts refresh from the latest saved weekly entry and quotation tracker data.</p></div><div class="actions"><button onclick="window.print()">Print / Save as PDF</button></div>`;
+ html+=`<div class="accuracy-box"><b>Data check:</b> Chart week ${t} | Latest weekly update saved: ${latestUpdate||'No updates yet'} | Latest quotation week saved: ${latestQuote||'No quotations yet'} | Weekly update records in chart week: ${countUpdatesForDate(t)} | Quotations in chart week: ${chartQuoteCount}. Exact numbers are shown under the charts for verification.</div>`;
+ html+=`<div class="grid">${card('Current Month Target',money(emeaCurrent.target),month.label)}${card('Sales Achievement',money(emeaCurrent.sales),fmtPct(emeaCurrent.sales,emeaCurrent.target))}${card('Delivery Achievement',money(emeaCurrent.delivery),fmtPct(emeaCurrent.delivery,emeaCurrent.target),emeaCurrent.delivery>=emeaCurrent.target?'good':'bad')}${card('Tentative Delivery',money(emeaCurrent.td),'Tentative sales '+money(emeaCurrent.ts))}</div>`;
+ html+=`<div class="chart-grid">`;
+ html+=chartGrouped(`EMEA ${month.label}: Target vs sales vs delivery`,'Current month comparison for presentation.', ['EMEA'], [{label:'Target',cls:'target',values:[emeaCurrent.target]},{label:'Sales',cls:'sales',values:[emeaCurrent.sales]},{label:'Delivery',cls:'delivery',values:[emeaCurrent.delivery]}]);
+ html+=chartGrouped('3-Month EMEA Projection','Current month plus next two months.', threeLabels, [{label:'Target',cls:'target',values:targetVals},{label:'Sales',cls:'sales',values:salesVals},{label:'Delivery',cls:'delivery',values:delVals}]);
+ html+=chartHBar(`Delivery achievement by region - ${month.label}`,'Delivery percentage against current month target.', regionRows.map(r=>({label:r.region,value:r.pct,sub:`Delivery ${money(r.delivery)} / Target ${money(r.target)}`,cls:r.pct>=100?'delivery':r.pct<70?'badfill':'warnfill'})), v=>Number(v||0).toFixed(1)+'%', true);
+ html+=chartGrouped(`Sales and delivery by region - ${month.label}`,'Current month values by region.', regionRows.map(r=>r.region), [{label:'Sales',cls:'sales',values:regionRows.map(r=>r.sales)},{label:'Delivery',cls:'delivery',values:regionRows.map(r=>r.delivery)}]);
+ html+=chartHBar('Quarterly delivery achievement','EMEA delivery achievement percentage by quarter.', qRows, v=>Number(v||0).toFixed(1)+'%', true);
+ html+=chartHBar('Annual delivery achievement by member','Member delivery percentage against annual target. TBH remains last.', memberRows, v=>Number(v||0).toFixed(1)+'%', true);
+ html+=chartHBar('Quotation value sent this week by region',`Quotation tracker value for week ${t}.`, quoteRegions, money, false);
+ html+=chartGrouped('Tentative sales and delivery by region','Current month tentative pipeline by region.', regionRows.map(r=>r.region), [{label:'Tentative sales',cls:'sales',values:regionRows.map(r=>r.ts)},{label:'Tentative delivery',cls:'delivery',values:regionRows.map(r=>r.td)}]);
+ html+=`</div>`;
+ document.getElementById('charts').innerHTML=html;
+}
+
+function renderQuotes(){let html=`<div class="card"><h2>Quotation Tracker</h2><div class="form-row"><div><label>Team Member</label><select id="qMember">${TEAM.map(x=>`<option>${x.name}</option>`).join('')}</select></div><div><label>Quotation Week Tuesday</label><input type="date" id="qTue" value="${activeTuesday()}"></div><div><label>Customer Name</label><input id="qCustomer"></div><div><label>Company Name</label><input id="qCompany"></div><div><label>Email</label><input id="qEmail"></div><div><label>Phone</label><input id="qPhone"></div></div><div class="form-row"><div><label>Course Name</label><input id="qCourse"></div><div><label>Seats</label><input type="number" id="qSeats" min="0"></div><div><label>Value AUD</label><input type="number" id="qValue" min="0"></div><div><label>Closing Expectation</label><select id="qExpectation"><option>High</option><option>Medium</option><option>Low</option></select></div><div><label>Expected Close Date</label><input type="date" id="qClose"></div><div style="align-self:end"><button onclick="addQuote()">Add Quotation</button></div></div></div><div class="card"><h3>All Quotations</h3><table><thead><tr><th>Week</th><th>Member</th><th>Region</th><th>Customer / Company</th><th>Contact</th><th>Course</th><th>Seats</th><th>Value</th><th>Expectation</th><th>Close Date</th><th></th></tr></thead><tbody>${state.quotes.map((q,i)=>`<tr><td>${q.tue}</td><td>${q.member}</td><td>${TEAM.find(m=>m.name===q.member)?.region||''}</td><td><b>${q.customer}</b><br>${q.company}</td><td>${q.email}<br>${q.phone}</td><td>${q.course}</td><td class="num">${q.seats}</td><td class="num">${money(q.value)}</td><td>${q.expectation}</td><td>${q.close}</td><td><button class="danger" onclick="delQuote(${i})">Delete</button></td></tr>`).join('')}</tbody></table></div>`; document.getElementById('quotes').innerHTML=html;}
+window.addQuote=function(){let q={id:makeId('q'),member:qMember.value,tue:qTue.value,customer:qCustomer.value,company:qCompany.value,email:qEmail.value,phone:qPhone.value,course:qCourse.value,seats:Number(qSeats.value||0),value:Number(qValue.value||0),expectation:qExpectation.value,close:qClose.value};state.quotes.push(q);localStorage.setItem('fy26_27_emea_dashboard', JSON.stringify(state));renderAll();writeToSheet('saveQuote',q).then(()=>alert('Quotation saved'+(onlineEnabled()?' in Google Sheet.':' locally.'))).catch(e=>alert('Quotation saved locally, but Google Sheet sync failed: '+e.message));}
+window.delQuote=function(i){if(confirm('Delete this quotation?')){let q=state.quotes[i]||{};state.quotes.splice(i,1);localStorage.setItem('fy26_27_emea_dashboard', JSON.stringify(state));renderAll(); if(q.id) writeToSheet('deleteQuote',{id:q.id}).catch(e=>alert('Deleted locally, but Google Sheet delete failed: '+e.message));}}
+function renderSettings(){document.getElementById('settings').innerHTML=`<div class="card"><h2>Backup / Reset</h2><p class="note"><b>Online mode:</b> ${onlineEnabled()?'Enabled. Data is loaded from the shared Google Sheet.':'Not configured. Paste your Apps Script Web App URL inside the HTML file.'}</p><div class="actions"><button onclick="loadRemoteData()">Refresh From Google Sheet</button><button onclick="exportExcel()">Export Excel File</button><button class="secondary" onclick="exportData()">Export Backup JSON</button><button class="secondary" onclick="document.getElementById('importFile').click()">Import Backup JSON</button><button class="danger" onclick="resetData()">Reset Local Browser Data</button><input class="hidden" id="importFile" type="file" accept="application/json" onchange="importData(event)"></div></div>`}
+
+function esc(v){return String(v??'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function xlsTable(title,headers,rows){return `<h2>${esc(title)}</h2><table border="1"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table><br>`}
+window.exportExcel=function(){let t=dashboardTuesday(), mkeys=threeMonthKeys(t), rows=[];
+ TEAM.forEach(mem=>{MONTHS.forEach(m=>{let fn=x=>x.name===mem.name; let target=monthTarget(mem,m.key); rows.push([mem.region,mem.name,m.label,target,latestValue(mem.name,m.key,'sales',t),latestValue(mem.name,m.key,'delivery',t),fmtPct(latestValue(mem.name,m.key,'delivery',t),target),latestValue(mem.name,m.key,'tentativeSales',t),latestValue(mem.name,m.key,'tentativeDelivery',t),latestTuesdayForMonth(mem.name,m.key,t)||'']);})});
+ let regionRows=[]; [['EMEA',x=>true],...regionList().map(r=>[r,x=>x.region===r])].forEach(([label,fn])=>{let target=targetMembers(fn,mkeys), sales=sumMembers(fn,mkeys,'sales',t), delivery=sumMembers(fn,mkeys,'delivery',t); regionRows.push([label,target,sales,delivery,fmtPct(delivery,target),sumMembers(fn,mkeys,'tentativeSales',t),sumMembers(fn,mkeys,'tentativeDelivery',t)]);});
+ let updateRows=[]; Object.keys(state.updates||{}).forEach(member=>{Object.keys(state.updates[member]||{}).forEach(tue=>{Object.keys(state.updates[member][tue]||{}).forEach(mkey=>{let u=state.updates[member][tue][mkey], mem=TEAM.find(x=>x.name===member)||{}, mo=MONTHS.find(x=>x.key===mkey)||{}; updateRows.push([tue,mem.region||'',member,mo.label||mkey,u.sales||0,u.delivery||0,u.tentativeSales||0,u.tentativeDelivery||0,u.notes||'']);})})});
+ let quoteRows=(state.quotes||[]).map(q=>[q.tue,q.member,(TEAM.find(m=>m.name===q.member)||{}).region||'',q.customer,q.company,q.email,q.phone,q.course,q.seats,q.value,q.expectation,q.close]);
+ let weeklyRegionRows=[]; orderedRegionListWithEmea().forEach(region=>{let fn=regionFilter(region);let quotes=(state.quotes||[]).filter(q=>q.tue===t && (region==='EMEA' || (TEAM.find(m=>m.name===q.member)||{}).region===region));let qValue=quotes.reduce((a,q)=>a+Number(q.value||0),0);let target=targetMembers(fn,mkeys), sales=sumMembers(fn,mkeys,'sales',t), delivery=sumMembers(fn,mkeys,'delivery',t);weeklyRegionRows.push([t,region,target,sales,delivery,fmtPct(delivery,target),sumMembers(fn,mkeys,'tentativeSales',t),sumMembers(fn,mkeys,'tentativeDelivery',t),quotes.length,qValue]);});
+ let html=`<html><head><meta charset="utf-8"></head><body>`+
+   xlsTable('EMEA Region Summary - Current 3 Months', ['Region','3-Month Target','Sales','Delivery','Delivery %','Tentative Sales','Tentative Delivery'], regionRows)+
+   xlsTable('EMEA Quarterly Numbers', ['Quarter','Target','Sales Projection','Delivery Projection','Delivery %','Delivery Gap','Tentative Sales','Tentative Delivery'], [0,1,2,3].map(q=>{let keys=quarterKeys(q), target=targetMembers(x=>true,keys), sales=sumMembers(x=>true,keys,'sales',t), delivery=sumMembers(x=>true,keys,'delivery',t), ts=sumMembers(x=>true,keys,'tentativeSales',t), td=sumMembers(x=>true,keys,'tentativeDelivery',t); return [QUARTERS[q],target,sales,delivery,fmtPct(delivery,target),target-delivery,ts,td]}))+
+   xlsTable('Member Monthly Summary', ['Region','Member','Month','Monthly Target','Sales','Delivery','Delivery %','Tentative Sales','Tentative Delivery','Latest Tuesday'], rows)+
+   xlsTable('Weekly Updates Raw Data', ['Tuesday','Region','Member','Month','Sales','Delivery','Tentative Sales','Tentative Delivery','Notes'], updateRows)+
+   xlsTable('Weekly Regional Update', ['Week Tuesday','Region','3-Month Target','Sales','Delivery','Delivery %','Tentative Sales','Tentative Delivery','Quotations Sent','Quotation Value AUD'], weeklyRegionRows)+
+   xlsTable('Quotation Tracker', ['Week Tuesday','Member','Region','Customer','Company','Email','Phone','Course','Seats','Value AUD','Expectation','Expected Close Date'], quoteRows)+`</body></html>`;
+ let blob=new Blob([html],{type:'application/vnd.ms-excel'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fy26_27_emea_dashboard_export.xls';a.click();}
+
+window.exportData=function(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fy26_27_emea_dashboard_backup.json';a.click()}
+window.importData=function(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state=JSON.parse(r.result);save()};r.readAsText(f)}
+window.resetData=function(){if(confirm('This will delete all saved projections and quotations in this browser.')){state={updates:{},quotes:[]};save()}}
+function renderAll(){renderManager();renderRegions();renderQYTD();renderEntry();renderIndividual();renderQuotes();renderWeeklyRegion();renderCharts();renderSettings()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById(b.dataset.view).classList.remove('hidden')}));
+renderAll();
+</script>
+</body>
+</html>
